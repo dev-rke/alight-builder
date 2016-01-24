@@ -3,7 +3,10 @@ class main
 	files: {}
 	download: 
 		fileSize: 0
-		uncompressed: ""
+		uncompressed: {
+			fileSize: 0
+			content: ""
+		}
 
 	constructor: ->
 		window.main = this
@@ -61,7 +64,7 @@ class main
 		, deep: true
 
 	onCompile: ->
-		@download.uncompressed = ""
+		@download.uncompressed.content = ""
 
 		res  = @core.prefix.content
 		res += @core.fquery.content
@@ -83,8 +86,8 @@ class main
 		res = res.replace(/{{{version}}}/, version.version)
 		res = "/**\n * Angular Light " + version.version + "\n * (c) 2015 Oleg Nechaev\n * Released under the MIT License.\n * " + version.date + ", http://angularlight.org/ \n */\n" + res
 
-		@download.uncompressed = 'data:application/javascript;charset:utf-8,' + encodeURIComponent(res)
-		#  + btoa(res)
+		@download.uncompressed.content = 'data:application/javascript;charset:utf-8,' + encodeURIComponent(res)
+		@download.uncompressed.fileSize = res.length
 
 alight.ctrl.main = main
 
@@ -94,7 +97,7 @@ alight.filters.formatBytes = (value, expression, scope) ->
 	bytes = value
 	sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
 	return '0 Byte' if bytes is 0
-	i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)))
-	Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i]
+	i = parseInt(Math.floor(Math.log(bytes) / Math.log(1000)))
+	Math.round(bytes / Math.pow(1000, i), 2) + ' ' + sizes[i]
 
 alight.bootstrap "#app"

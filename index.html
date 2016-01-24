@@ -22,7 +22,7 @@
 		<div class="col-sm-6">
 			<h3>Download custom build</h3>
 			<button al-click="onCompile()" class="btn btn-default">Compile {{download.fileSize | formatBytes}}</button>
-			<a al-if="download.uncompressed" href="{{download.uncompressed}}" class="btn btn-success" download="alight.js">Download File {{download.fileSize | formatBytes}}</a>
+			<a al-if="download.uncompressed.content" href="{{download.uncompressed.content}}" class="btn btn-success" download="alight.js">Download File {{download.uncompressed.fileSize | formatBytes}}</a>
 		</div>
 	</div>
 	<div class="row">
