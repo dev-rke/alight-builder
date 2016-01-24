@@ -28,6 +28,7 @@
 	<div class="row">
 		<div class="col-sm-6">
 			<h3>Directives</h3>
+			<button class="btn btn-default" al-click="onToggleAll('files.directive')" />Toggle All</button>
 			<ul class="list-unstyled">
 				<li al-repeat="it in files.directive">
 					<label><input type="checkbox" al-checked="it.checked" /> {{it.name}} {{it.compiled_size | formatBytes}}</label>
@@ -36,6 +37,7 @@
 		</div>
 		<div class="col-sm-6">
 			<h3>Filters</h3>
+			<button class="btn btn-default" al-click="onToggleAll('files.filter')" />Toggle All</button>
 			<ul class="list-unstyled">
 				<li al-repeat="it in files.filter">
 					<label><input type="checkbox" al-checked="it.checked" /> {{it.name}} {{it.compiled_size | formatBytes}}</label>

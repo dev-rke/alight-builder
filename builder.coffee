@@ -45,6 +45,7 @@ class main
 							if item.name.match(/\.coffee$/)
 								item.content = CoffeeScript.compile(data, {bare: true})
 								item.compiled_size = item.content.length
+								item.name = item.name.replace(/\.coffee$/, '.js')
 							else
 								item.content = data
 								item.compiled_size = item.size
@@ -62,6 +63,12 @@ class main
 					size += item.compiled_size
 			@download.fileSize = size
 		, deep: true
+
+	onToggleAll: (exp) ->
+		list = @$getValue(exp)
+		for item in list when item.type is 'file'
+			item.checked = !item.checked
+		@$scan()
 
 	onCompile: ->
 		@download.uncompressed.content = ""
