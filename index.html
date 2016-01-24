@@ -21,8 +21,28 @@
 		</div>
 		<div class="col-sm-6">
 			<h3>Download custom build</h3>
-			<button al-click="onCompile()" class="btn btn-default">Compile {{download.fileSize | formatBytes}}</button>
-			<a al-if="download.uncompressed.content" href="{{download.uncompressed.content}}" class="btn btn-success" download="alight.js">Download File {{download.uncompressed.fileSize | formatBytes}}</a>
+			<p>
+				Please follow the steps to download your custom build.
+			</p>
+			<ol>
+				<li>
+					<button al-click="onCompile()" class="btn btn-default">Compile {{download.uncompressed.fileSize | formatBytes}}</button>
+				</li>
+				<li>
+					<a al-class="disabled:!download.uncompressed.content" href="data:application/javascript;charset:utf-8,{{download.uncompressed.content | encodeDataUri}}" class="btn btn-success" download="alight.custom.js">Download File {{download.uncompressed.fileSize | formatBytes}}</a>
+				</li>
+				<li>
+					<button al-class="disabled:!download.uncompressed.content" al-click="onMinify()" class="btn btn-default">Minify</button> (your browser might hang a few seconds in this step)
+					<br />
+					<br />
+					<div class="progress">
+						<div class="progress-bar" style="width: {{status}}%"></div>
+					</div>
+				</li>
+				<li>
+					<a al-class="disabled:!download.compressed.content" href="data:application/javascript;charset:utf-8,{{download.compressed.content | encodeDataUri}}" class="btn btn-success" download="alight.custom.min.js">Download Minified File {{download.compressed.fileSize | formatBytes}}</a>
+				</li>
+			</ol>
 		</div>
 	</div>
 	<div class="row">
@@ -49,6 +69,7 @@
 <script src="builder.coffee" type="text/coffeescript"></script>
 <script src="coffee-script.js" type="text/javascript"></script>
 <script src="alight_0.12.last.min.js" type="text/javascript"></script>
+<script src="uglifyjs.js" type="text/javascript" async></script>
 </body>
 </html>
 

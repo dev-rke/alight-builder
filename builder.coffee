@@ -3,10 +3,13 @@ class main
 	files: {}
 	download: 
 		fileSize: 0
-		uncompressed: {
+		uncompressed:
 			fileSize: 0
 			content: ""
-		}
+		compressed:
+			fileSize: 0
+			content: ""
+	status: 0
 
 	constructor: ->
 		window.main = this
@@ -61,7 +64,7 @@ class main
 			for key,list of @files
 				for item in list when item.type is 'file' and item.checked
 					size += item.compiled_size
-			@download.fileSize = size
+			@download.uncompressed.fileSize = size
 		, deep: true
 
 	onToggleAll: (exp) ->
@@ -91,13 +94,60 @@ class main
 			date: @core.version.content.match(/date.*?\'([^\']+)\'/)[1]
 
 		res = res.replace(/{{{version}}}/, version.version)
-		res = "/**\n * Angular Light " + version.version + "\n * (c) 2015 Oleg Nechaev\n * Released under the MIT License.\n * " + version.date + ", http://angularlight.org/ \n */\n" + res
+		res = "/**\n * Angular Light " + version.version + "\n * (c) 2016 Oleg Nechaev\n * Released under the MIT License.\n * " + version.date + ", http://angularlight.org/, custom build */\n" + res
 
-		@download.uncompressed.content = 'data:application/javascript;charset:utf-8,' + encodeURIComponent(res)
+		@download.uncompressed.content = res
 		@download.uncompressed.fileSize = res.length
+
+	onMinify: ->
+		version =
+			version: @core.version.content.match(/version.*?\'([^\']+)\'/)[1]
+			date: @core.version.content.match(/date.*?\'([^\']+)\'/)[1]
+
+		callback = (res) =>
+			res = res.replace(/{{{version}}}/, version.version)
+			res = "// Angular Light " + version.version + " (c) 2016 Oleg Nechaev, MIT License. " + version.date + ", http://angularlight.org/, custom build\n" + res
+			@download.compressed.content = res
+			@download.compressed.fileSize = res.length
+
+		res = @uglify(@download.uncompressed.content, callback)
+
+	uglify: (code, callback) ->
+		scope = @
+		scope.status = 0
+		setTimeout ->
+			toplevel = UglifyJS.parse(code)
+			scope.status = 15
+			scope.$scan()
+			setTimeout ->
+				toplevel.figure_out_scope()
+				scope.status = 30
+				scope.$scan()
+				setTimeout ->
+					compressor = UglifyJS.Compressor()
+					compressedAst = toplevel.transform(compressor)
+					scope.status = 60
+					scope.$scan()
+					setTimeout ->
+						compressedAst.figure_out_scope()
+						scope.status = 80
+						scope.$scan()
+						setTimeout ->
+							callback compressedAst.print_to_string()
+							scope.status = 100
+							scope.$scan()
+						, 250
+					, 250
+				, 250
+			, 250
+		, 250
+
 
 alight.ctrl.main = main
 
+
+alight.filters.encodeDataUri = (value, exp, scope) ->
+	encodeURIComponent(value)
 
 alight.filters.formatBytes = (value, expression, scope) ->
 	return if typeof value isnt "number"
