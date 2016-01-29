@@ -19,7 +19,7 @@
 			<h3>Core</h3>
 			<ul class="list-unstyled">
 				<li>
-					<label><input type="checkbox" al-checked="core.fqueryIE8.checked" /> {{core.fqueryIE8.name}} (IE8 compatibility layer) {{core.fqueryIE8.compiled_size | formatBytes}}</label>
+					<label><input type="checkbox" al-checked="core.fqueryIE8.checked" /> {{core.fqueryIE8.blankName}}{{core.fqueryIE8.ext}} (IE8 compatibility layer) {{core.fqueryIE8.compiled_size | formatBytes}}</label>
 				</li>
 			</ul>
 		</div>
@@ -55,7 +55,7 @@
 			<button class="btn btn-default" al-click="onToggleAll('files.directive')" />Toggle All</button>
 			<ul class="list-unstyled">
 				<li al-repeat="it in files.directive">
-					<label><input type="checkbox" al-checked="it.checked" /> {{it.name}} {{it.compiled_size | formatBytes}}</label>
+					<label><input type="checkbox" al-checked="it.checked" /> {{it.blankName}}{{it.ext}} {{it.compiled_size | formatBytes}}</label>
 				</li>
 			</ul>
 		</div>
@@ -64,7 +64,7 @@
 			<button class="btn btn-default" al-click="onToggleAll('files.filter')" />Toggle All</button>
 			<ul class="list-unstyled">
 				<li al-repeat="it in files.filter">
-					<label><input type="checkbox" al-checked="it.checked" /> {{it.name}} {{it.compiled_size | formatBytes}}</label>
+					<label><input type="checkbox" al-checked="it.checked" /> {{it.blankName}}{{it.ext}} {{it.compiled_size | formatBytes}}</label>
 				</li>
 			</ul>
 		</div>

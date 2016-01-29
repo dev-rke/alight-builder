@@ -10,9 +10,12 @@ class main
 			fileSize: 0
 			content: ""
 	status: 0
+	preCheckedItems: []
 
 	constructor: ->
 		window.main = this
+
+		@preCheckedItems = document.location.hash.substr(1).split('-')
 
 		baseUrl = 'https://api.github.com/repos/lega911/angular-light/contents/'
 		sources = {
@@ -28,7 +31,7 @@ class main
 				processStructure = (data) =>
 					@files[source] = JSON.parse(data)
 					@$scan()
-					@fetchFiles(source)					
+					@fetchFiles(source)
 
 				alight.f$.ajax
 					url: url
@@ -40,31 +43,47 @@ class main
 	fetchFiles: (list) ->
 		for item in @files[list] when item.type is 'file'
 			item.checked = false
-			do (item) =>
+			do (item, list) =>
 				alight.f$.ajax
 					url: item.download_url
 					success: (data) =>
 						setTimeout =>
-							if item.name.match(/\.coffee$/)
+							extensions = /(\.coffee|\.js)$/
+							item.ext = item.name.match(extensions)?[1]
+							item.blankName = item.name.replace(extensions, '')
+
+							if item.ext is '.coffee'
 								item.content = CoffeeScript.compile(data, {bare: true})
 								item.compiled_size = item.content.length
-								item.name = item.name.replace(/\.coffee$/, '.js')
-							else
+								item.ext = '.js'
+							else if item.ext is '.js'
 								item.content = data
 								item.compiled_size = item.size
-							if item.name.match(/(prefix|fquery|fqueryIE8|postfix|version)\.js$/)
-								@core[item.name.replace('.js', '')] = item
-							item.checked = true
+								if list is 'js'
+									@core[item.blankName] = item
+
+							if list in ['filter', 'directive'] or (list is 'js' and item.blankName is 'fqueryIE8')
+								if @preCheckedItems.length is 0 or item.blankName in @preCheckedItems
+									item.checked = true
+								else
+									item.checked = false
+							else
+								item.checked = true
+
 							@$scan()
 						, 200
-		
+
 	trackSize: ->
 		@$watch 'files', =>
 			size = 0
+			hash = []
 			for key,list of @files
 				for item in list when item.type is 'file' and item.checked
 					size += item.compiled_size
+					if key in ['filter', 'directive'] or (key is 'js' and item.blankName is 'fqueryIE8')
+						hash.push item.blankName
 			@download.uncompressed.fileSize = size
+			document.location.hash = '#' + hash.join('-')
 		, deep: true
 
 	onToggleAll: (exp) ->
@@ -94,7 +113,14 @@ class main
 			date: @core.version.content.match(/date.*?\'([^\']+)\'/)[1]
 
 		res = res.replace(/{{{version}}}/, version.version)
-		res = "/**\n * Angular Light " + version.version + "\n * (c) 2016 Oleg Nechaev\n * Released under the MIT License.\n * " + version.date + ", http://angularlight.org/, custom build */\n" + res
+		res = [
+			"/**"
+			"  * Angular Light " + version.version + ", (c) 2016 Oleg Nechaev"
+			"  * Released under the MIT License."
+			"  * " + version.date + " http://angularlight.org/"
+			"  * custom build: " + document.location.href
+			"  */"
+		].join('\n') + "\n" + res
 
 		@download.uncompressed.content = res
 		@download.uncompressed.fileSize = res.length
@@ -106,7 +132,7 @@ class main
 
 		callback = (res) =>
 			res = res.replace(/{{{version}}}/, version.version)
-			res = "// Angular Light " + version.version + " (c) 2016 Oleg Nechaev, MIT License. " + version.date + ", http://angularlight.org/, custom build\n" + res
+			res = "// Angular Light " + version.version + " (c) 2016 Oleg Nechaev, MIT License. " + version.date + ", http://angularlight.org/, custom build: " + document.location.href + "\n" + res
 			@download.compressed.content = res
 			@download.compressed.fileSize = res.length
 
