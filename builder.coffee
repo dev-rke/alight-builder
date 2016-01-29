@@ -15,7 +15,8 @@ class main
 	constructor: ->
 		window.main = this
 
-		@preCheckedItems = document.location.hash.substr(1).split('-')
+		if document.location.hash
+			@preCheckedItems = document.location.hash.substr(1).split('-')
 
 		baseUrl = 'https://api.github.com/repos/lega911/angular-light/contents/'
 		sources = {
