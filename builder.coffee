@@ -112,7 +112,7 @@ class main
 			version: @core.version.content.match(/version.*?\'([^\']+)\'/)[1]
 			date: @core.version.content.match(/date.*?\'([^\']+)\'/)[1]
 
-		res = res.replace(/{{{version}}}/, version.version)
+		res = res.replace('{{{version}}}', version.version)
 		res = [
 			"/**"
 			"  * Angular Light " + version.version + ", (c) 2016 Oleg Nechaev"
@@ -131,7 +131,7 @@ class main
 			date: @core.version.content.match(/date.*?\'([^\']+)\'/)[1]
 
 		callback = (res) =>
-			res = res.replace(/{{{version}}}/, version.version)
+			res = res.replace('{{{version}}}', version.version)
 			res = "// Angular Light " + version.version + " (c) 2016 Oleg Nechaev, MIT License. " + version.date + ", http://angularlight.org/, custom build: " + document.location.href + "\n" + res
 			@download.compressed.content = res
 			@download.compressed.fileSize = res.length
