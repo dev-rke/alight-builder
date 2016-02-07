@@ -50,7 +50,7 @@
 					<button al-click="onCompile()" class="btn btn-default">Compile {{download.uncompressed.fileSize | formatBytes}}</button>
 				</li>
 				<li>
-					<a al-class="disabled:!download.uncompressed.content" href="data:application/javascript;charset:utf-8,{{download.uncompressed.content | encodeDataUri}}" class="btn btn-success" download="alight.custom.js">Download File {{download.uncompressed.fileSize | formatBytes}}</a>
+					<a al-class="disabled:!download.uncompressed.content" href="data:application/javascript;charset:utf-8,{{download.uncompressed.content | encodeDataUri}}" class="btn btn-success" download="alight.custom.js">Download File {{download.uncompressed.content.length | formatBytes}}</a>
 				</li>
 				<li>
 					<button al-class="disabled:!download.uncompressed.content" al-click="onMinify()" class="btn btn-default">Minify</button> (your browser might hang a few seconds in this step)
