@@ -127,6 +127,8 @@ class main
 		@download.uncompressed.fileSize = res.length
 
 	onMinify: ->
+		return if not @download.uncompressed.content
+
 		version =
 			version: @core.version.content.match(/version.*?\'([^\']+)\'/)[1]
 			date: @core.version.content.match(/date.*?\'([^\']+)\'/)[1]
