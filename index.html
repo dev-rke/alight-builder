@@ -1,82 +1,89 @@
 <!doctype html>
 <html>
 <head>
-	<meta charset="utf-8" />
-	<title>alight builder</title>
-	<link href="bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <meta charset="utf-8" />
+    <title>alight builder</title>
+    <link href="bootstrap.min.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <div id="app" al-ctrl="main" class="container">
-	<div class="page-header">
-		<h1 class="text-center">
-			alight builder
-			<br />
-			<small>Select the resources for your custom <a href="https://github.com/lega911/angular-light/">alight</a> build.</small>
-		</h1>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-			<h3>Core</h3>
-			<ul class="list-unstyled">
-				<li>
-					<label><input type="checkbox" al-checked="core.fqueryIE8.checked" /> {{core.fqueryIE8.blankName}}{{core.fqueryIE8.ext}} (IE8 compatibility layer) {{core.fqueryIE8.compiled_size | formatBytes}}</label>
-				</li>
-			</ul>
+    <div class="page-header">
+        <h1 class="text-center">
+            alight builder
+            <br />
+            <small>Select the resources for your custom <a href="https://github.com/lega911/angular-light/">alight</a> build.</small>
+        </h1>
+    </div>
 
-			<h3>Filters</h3>
-			<button class="btn btn-default" al-click="onToggleAll('files.filter')" />Toggle All</button>
-			<ul class="list-unstyled">
-				<li al-repeat="it in files.filter">
-					<label><input type="checkbox" al-checked="it.checked" /> {{it.blankName}}{{it.ext}} {{it.compiled_size | formatBytes}}</label>
-				</li>
-			</ul>
-		</div>
-		<div class="col-sm-4">
-			<h3>Directives</h3>
-			<button class="btn btn-default" al-click="onToggleAll('files.directive')" />Toggle All</button>
-			<ul class="list-unstyled">
-				<li al-repeat="it in files.directive">
-					<label><input type="checkbox" al-checked="it.checked" /> {{it.blankName}}{{it.ext}} {{it.compiled_size | formatBytes}}</label>
-				</li>
-			</ul>
-		</div>
-		<div class="col-sm-4">
-			<h3>Download custom build</h3>
-			<p>
-				Please follow the steps to generate your custom build.
-			</p>
-			<ol>
-				<li>
-					<button al-click="onCompile()" class="btn btn-default">Compile {{download.uncompressed.fileSize | formatBytes}}</button>
-				</li>
-				<li>
-					<a al-class="disabled:!download.uncompressed.content" href="data:application/javascript;charset:utf-8,{{download.uncompressed.content | encodeDataUri}}" class="btn btn-success" download="alight.custom.js">Download File {{download.uncompressed.content.length | formatBytes}}</a>
-				</li>
-				<li>
-					<button al-class="disabled:!download.uncompressed.content" al-click="onMinify()" class="btn btn-default">Minify</button> (your browser might hang a few seconds in this step)
-					<br />
-					<br />
-					<div class="progress">
-						<div class="progress-bar" style="width: {{status}}%"></div>
-					</div>
-				</li>
-				<li>
-					<a al-class="disabled:!download.compressed.content" href="data:application/javascript;charset:utf-8,{{download.compressed.content | encodeDataUri}}" class="btn btn-success" download="alight.custom.min.js">Download Minified File {{download.compressed.fileSize | formatBytes}}</a>
-				</li>
-			</ol>
-		</div>
-	</div>
-	<nav class="navbar navbar-default navbar-inverse">
-		<p class="navbar-text">
-			&copy 2016, Reiner Kempkes, Released under the MIT License
-		</p>
-		<p class="navbar-text"><a href="https://github.com/dev-rke/alight-builder" class="navbar-link">Project at Github</a></p>
-	</nav>
+    <div class="row">
+
+        <div class="col-sm-4">
+            <h3>Download custom build</h3>
+            <p>
+                Please follow the steps to generate your custom build.
+            </p>
+            <p>
+                Version:
+                <select class="form-control" @change="toggleVersion($value)">
+                    <option al-repeat="ver in versions" value="{{ver}}">{{ver}}</option>
+                </select>
+            </p>
+            <p>
+                Build:
+                <select class="form-control" @change="toggleBuild($value)">
+                    <option value="">None</option>
+                    <option value="core">Core</option>
+                    <option value="basis">Basis</option>
+                    <option value="full">Full</option>
+                    <option value="compatibility">Full + Compatibility</option>
+                    <option value="all">All</option>
+                </select>
+            </p>
+            <ol al-cloak>
+                <li>
+                    <button @click="compile()" class="btn btn-default">Compile</button>
+                </li>
+                <li>
+                    <a :hidden="!resultFile" href="data:application/javascript;charset:utf-8,{{resultFile | encodeDataUri}}" class="btn btn-success" download="alight.custom.js">Download File</a>
+                    <a :hidden="resultFile" class="btn btn-success disabled" href>Download File</a>
+                </li>
+                <li>
+                    <button :disabled="!resultFile" @click="minify()" class="btn btn-default">Minify</button> (your browser might hang a few seconds in this step)
+                    <br />
+                    <br />
+                    <div al-if="status" class="progress">
+                        <div class="progress-bar" :style.width.tpl="{{status}}%"></div>
+                    </div>
+                </li>
+                <li>
+                    <a :hidden="!minifiedFile" href="data:application/javascript;charset:utf-8,{{minifiedFile | encodeDataUri}}" class="btn btn-success" download="alight.custom.min.js">Download Minified File</a>
+                    <a :hidden="minifiedFile" @click="" href class="btn btn-success disabled">Download Minified File</a>
+                </li>
+            </ol>
+        </div>
+
+        <div class="col-sm-4" al-repeat="(partName, part) in files">
+            <h3>{{partName}}</h3>
+            <button class="btn btn-default" @click="toggleAll(part)" />Toggle All</button>
+            <ul class="list-unstyled">
+                <li al-repeat="file in part">
+                    <label><input type="checkbox" al-checked="file.checked" /> {{file.file}}</label>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+    <nav class="navbar navbar-default navbar-inverse">
+        <p class="navbar-text">
+            &copy 2016, Reiner Kempkes, Released under the MIT License
+        </p>
+        <p class="navbar-text"><a href="https://github.com/dev-rke/alight-builder" class="navbar-link">Project at Github</a></p>
+    </nav>
 </div>
+<script src="service.coffee" type="text/coffeescript"></script>
 <script src="builder.coffee" type="text/coffeescript"></script>
 <script src="coffee-script.js" type="text/javascript"></script>
 <script src="alight_0.12.last.min.js" type="text/javascript"></script>
 <script src="uglifyjs.js" type="text/javascript" async></script>
 </body>
 </html>
-
